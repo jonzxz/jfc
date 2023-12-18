@@ -8,7 +8,7 @@ run:
 	go run .
 
 add:
-	curl localhost:8080/add --include --header "Content-Type: application/json" --request "POST" --data '{"id":3,"name":"Jeff","TelegramId":"@jeff"}'
+	curl localhost:8080/add --include --header "Content-Type: application/json" --request "POST" --data '{"name":"Jeff","TelegramId":"@jeff"}'
 
 db:
 	docker run --name="db" -d -p 3306:3306 \
