@@ -3,8 +3,6 @@ package models
 import (
 	"database/sql"
 	"log"
-
-	"github.com/jonzxz/jfc/constants"
 )
 
 type Person struct {
@@ -13,15 +11,7 @@ type Person struct {
 	TelegramId string `json:"TelegramId"`
 }
 
-func GetAllPersonsHandler() []Person {
-	db, err := sql.Open("mysql", constants.DB_CONFIGS.FormatDSN())
-
-	if err != nil {
-		log.Fatalf("err %v\n", err)
-		return nil
-	}
-
-	defer db.Close()
+func GetAllPersonsHandler(db *sql.DB) []Person {
 
 	results, err := db.Query("SELECT * FROM PERSON")
 
@@ -44,4 +34,15 @@ func GetAllPersonsHandler() []Person {
 
 	return people
 
+}
+
+func AddPersonHandler(db *sql.DB, person Person) {
+	insert, err := db.Query(
+		"INSERT INTO PERSON (NAME, TELEGRAM_ID) VALUES (?,?)",
+		person.Name, person.TelegramId)
+
+	if err != nil {
+		log.Fatalf("err %v\n", err)
+	}
+	defer insert.Close()
 }
