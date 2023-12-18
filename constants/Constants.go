@@ -6,7 +6,7 @@ import (
 
 var (
 	//db *sql.DB
-	cfg = mysql.Config{
+	DB_CONFIGS = mysql.Config{
 		User:   "bizuser",
 		Passwd: "secretpassword",
 		Net:    "tcp",
