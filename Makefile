@@ -1,3 +1,19 @@
+.PHONY: default
+
+define HELP
+	make build
+	make dependencies
+	make run
+	make add (add user)
+	make db (run db)
+	make stopdb
+endef
+
+export HELP
+
+default:
+	@echo "$$HELP"
+
 build:
 	go build .
 
