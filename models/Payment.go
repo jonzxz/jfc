@@ -33,3 +33,37 @@ func GetAllPaymentsHandler(db *sql.DB) []Payment {
 	return payments
 
 }
+
+func GetSpecificPaymentByIdHandler(db *sql.DB, id int) []Payment {
+	row := db.QueryRow("SELECT * FROM PAYMENT WHERE ID = ?", id)
+
+	var t Payment
+
+	if err := row.Scan(&t.ID, &t.Timestamp, &t.Type, &t.Remarks, &t.TotalAmount); err != nil {
+		if err == sql.ErrNoRows {
+			log.Fatalf("No such Payment by ID %d", id)
+			return nil
+		}
+		log.Fatalf("err %v", err)
+	}
+	return []Payment{t}
+}
+
+func GetPaymentsByTypeHandler(db *sql.DB, paymentType string) []Payment {
+	results, err := db.Query("SELECT * FROM PAYMENT WHERE TYPE = ?", paymentType)
+
+	if err != nil {
+		log.Fatalf("err %v\n", err)
+		return nil
+	}
+
+	payments := []Payment{}
+
+	for results.Next() {
+		var t Payment
+		err = results.Scan(&t.ID, &t.Timestamp, &t.Type, &t.Remarks, &t.TotalAmount)
+		payments = append(payments, t)
+	}
+
+	return payments
+}
