@@ -3,6 +3,8 @@ package models
 import (
 	"database/sql"
 	"log"
+	"strconv"
+	"time"
 )
 
 type Payment struct {
@@ -66,4 +68,48 @@ func GetPaymentsByTypeHandler(db *sql.DB, paymentType string) []Payment {
 	}
 
 	return payments
+}
+
+func GetPaymentsByMonthHandler(db *sql.DB, month string) []Payment {
+
+	epochRange := getStartEndEpochFromMonth(month)
+
+	results, err := db.Query("SELECT * FROM PAYMENT WHERE TIMESTAMP >= ? AND TIMESTAMP <= ?", epochRange["start"], epochRange["end"])
+
+	if err != nil {
+		log.Fatalf("err %v\n", err)
+		return nil
+	}
+
+	payments := []Payment{}
+
+	for results.Next() {
+		var t Payment
+		err = results.Scan(&t.ID, &t.Timestamp, &t.Type, &t.Remarks, &t.TotalAmount)
+		payments = append(payments, t)
+	}
+
+	return payments
+
+}
+
+func getStartEndEpochFromMonth(month string) map[string]int64 {
+	now := time.Now()
+	currentYear, _, _ := now.Date()
+	monthInt, _ := strconv.Atoi(month)
+	monthTime := time.Month(monthInt)
+	currentLocation := now.Location()
+	firstOfMonth := time.Date(currentYear, monthTime, 1, 0, 0, 0, 0, currentLocation)
+	lastOfMonth := firstOfMonth.AddDate(0, 1, -1)
+
+	startUnix := firstOfMonth.Unix()
+	endUnix := lastOfMonth.Unix()
+
+	epochs := make(map[string]int64)
+
+	epochs["start"] = startUnix
+	epochs["end"] = endUnix
+
+	return epochs
+
 }

@@ -55,6 +55,7 @@ func main() {
 
 		payments := []models.Payment{}
 
+		// if ID is supplied then everything else is ignored
 		if queryParams.Get("id") != "" {
 			id, err := strconv.Atoi(queryParams.Get("id"))
 			if err != nil {
@@ -64,6 +65,8 @@ func main() {
 
 		} else if queryParams.Get("type") != "" {
 			payments = models.GetPaymentsByTypeHandler(db, queryParams.Get("type"))
+		} else if queryParams.Get("month") != "" {
+			payments = models.GetPaymentsByMonthHandler(db, queryParams.Get("month"))
 		} else {
 			payments = models.GetAllPaymentsHandler(db)
 
