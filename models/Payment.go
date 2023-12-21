@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
@@ -37,19 +38,13 @@ func GetPaymentWrapper(db *gorm.DB, params url.Values) []Payment {
 	if params.Has("id") {
 		ids := strings.Split(params.Get("id"), ",")
 		payment = getPaymentsByIdHandler(db, ids)
-	}
-
-	if params.Has("type") && params.Has("month") {
-
-	}
-
-	if params.Has("type") {
+	} else if params.Has("type") && params.Has("month") {
+		fmt.Println("type and month")
+	} else if params.Has("type") {
 		payment = getPaymentsByTypeHandler(db, params.Get("type"))
-	}
-
-	if params.Has("month") {
+	} else if params.Has("month") {
+		fmt.Println("am here")
 		payment = getPaymentsByMonthHandler(db, params.Get("month"))
-
 	}
 	return payment
 
