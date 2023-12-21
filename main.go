@@ -55,26 +55,11 @@ func main() {
 		c.IndentedJSON(http.StatusCreated, newPerson)
 	})
 
-	//// model.Payment
+	// model.Payment
 	router.GET("/payments", func(c *gin.Context) {
-		//queryParams := c.Request.URL.Query()
+		queryParams := c.Request.URL.Query()
 
-		payments := []models.Payment{}
-
-		// if ID is supplied then everything else is ignored
-		//if queryParams.Get("id") != "" {
-		//id, err := strconv.Atoi(queryParams.Get("id"))
-		//if err != nil {
-		//log.Fatalf("err %v\n", err)
-		//}
-		//payments = models.GetSpecificPaymentByIdHandler(db, id)
-
-		//} else if queryParams.Get("type") != "" {
-		//payments = models.GetPaymentsByTypeHandler(db, queryParams.Get("type"))
-		//} else if queryParams.Get("month") != "" {
-		//payments = models.GetPaymentsByMonthHandler(db, queryParams.Get("month"))
-		//} else {
-		payments = models.GetAllPaymentsHandler(db)
+		payments := models.GetPaymentWrapper(db, queryParams)
 
 		//}
 		c.IndentedJSON(http.StatusOK, payments)

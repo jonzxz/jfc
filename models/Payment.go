@@ -1,96 +1,88 @@
 package models
 
 import (
-	"database/sql"
-	"log"
+	"net/url"
 	"strconv"
+	"strings"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Payment struct {
-	ID int `json:"ID"`
+	ID int `json:"ID" gorm:"primaryKey"`
 	// pass in as string, convert to uint64 epoch
-	Timestamp   int64   `json:"Timestamp"`
-	Type        string  `json:"Type"`
-	Remarks     string  `json:"Remarks"`
-	TotalAmount float32 `json:"TotalAmount"`
+	Timestamp   int64   `json:"Timestamp" gorm:"column:TIMESTAMP"`
+	Type        string  `json:"Type" gorm:"column:TYPE"`
+	Remarks     string  `json:"Remarks" gorm:"column:REMARKS"`
+	TotalAmount float32 `json:"TotalAmount" gorm:"column:TOTAL_AMOUNT"`
 }
 
-func GetAllPaymentsHandler(db *sql.DB) []Payment {
-	results, err := db.Query("SELECT * FROM PAYMENT")
+func (Payment) TableName() string {
+	return "PAYMENT"
+}
 
-	if err != nil {
-		log.Fatalf("err %v\n", err)
-		return nil
-	}
-
+func GetAllPaymentsHandler(db *gorm.DB) []Payment {
 	payments := []Payment{}
-
-	for results.Next() {
-		var t Payment
-		err = results.Scan(&t.ID, &t.Timestamp, &t.Type, &t.Remarks, &t.TotalAmount)
-		payments = append(payments, t)
-	}
+	db.Find(&payments)
 
 	return payments
+}
+
+// realistically only need
+// type + timestamp
+// timestamp
+func GetPaymentWrapper(db *gorm.DB, params url.Values) []Payment {
+	var payment []Payment
+	if params.Has("id") {
+		ids := strings.Split(params.Get("id"), ",")
+		payment = getPaymentsByIdHandler(db, ids)
+	}
+
+	if params.Has("type") && params.Has("month") {
+
+	}
+
+	if params.Has("type") {
+		payment = getPaymentsByTypeHandler(db, params.Get("type"))
+	}
+
+	if params.Has("month") {
+		payment = getPaymentsByMonthHandler(db, params.Get("month"))
+
+	}
+	return payment
 
 }
 
-func GetSpecificPaymentByIdHandler(db *sql.DB, id int) []Payment {
-	row := db.QueryRow("SELECT * FROM PAYMENT WHERE ID = ?", id)
-
-	var t Payment
-
-	if err := row.Scan(&t.ID, &t.Timestamp, &t.Type, &t.Remarks, &t.TotalAmount); err != nil {
-		if err == sql.ErrNoRows {
-			log.Fatalf("No such Payment by ID %d", id)
-			return nil
-		}
-		log.Fatalf("err %v", err)
-	}
-	return []Payment{t}
-}
-
-func GetPaymentsByTypeHandler(db *sql.DB, paymentType string) []Payment {
-	results, err := db.Query("SELECT * FROM PAYMENT WHERE TYPE = ?", paymentType)
-
-	if err != nil {
-		log.Fatalf("err %v\n", err)
-		return nil
-	}
-
-	payments := []Payment{}
-
-	for results.Next() {
-		var t Payment
-		err = results.Scan(&t.ID, &t.Timestamp, &t.Type, &t.Remarks, &t.TotalAmount)
-		payments = append(payments, t)
+func getPaymentsByIdHandler(db *gorm.DB, ids []string) []Payment {
+	var payments []Payment
+	if len(ids) == 1 {
+		var payment Payment
+		db.First(&payment, ids[0])
+		payments = append(payments, payment)
+	} else {
+		db.Find(&payments, ids)
 	}
 
 	return payments
 }
 
-func GetPaymentsByMonthHandler(db *sql.DB, month string) []Payment {
+func getPaymentsByTypeHandler(db *gorm.DB, paymentType string) []Payment {
 
+	var payments []Payment
+	db.Where("TYPE = ?", paymentType).Find(&payments)
+	return payments
+}
+
+func getPaymentsByMonthHandler(db *gorm.DB, month string) []Payment {
+
+	var payments []Payment
 	epochRange := getStartEndEpochFromMonth(month)
 
-	results, err := db.Query("SELECT * FROM PAYMENT WHERE TIMESTAMP >= ? AND TIMESTAMP <= ?", epochRange["start"], epochRange["end"])
-
-	if err != nil {
-		log.Fatalf("err %v\n", err)
-		return nil
-	}
-
-	payments := []Payment{}
-
-	for results.Next() {
-		var t Payment
-		err = results.Scan(&t.ID, &t.Timestamp, &t.Type, &t.Remarks, &t.TotalAmount)
-		payments = append(payments, t)
-	}
+	db.Where("TIMESTAMP BETWEEN ? AND ?", epochRange["start"], epochRange["end"]).Find(&payments)
 
 	return payments
-
 }
 
 func getStartEndEpochFromMonth(month string) map[string]int64 {
