@@ -1,48 +1,32 @@
 package models
 
 import (
-	"database/sql"
-	"log"
+	"fmt"
+
+	"gorm.io/gorm"
 )
 
 type Person struct {
-	ID         int    `json:"ID"`
-	Name       string `json:"Name"`
-	TelegramId string `json:"TelegramId"`
+	ID         int    `json:"ID" gorm:"primaryKey"`
+	Name       string `json:"Name" gorm:"column:NAME"`
+	TelegramId string `json:"TelegramId" gorm:"column:TELEGRAM_ID"`
 }
 
-func GetAllPersonsHandler(db *sql.DB) []Person {
+func (Person) TableName() string {
+	return "PERSON"
+}
 
-	results, err := db.Query("SELECT * FROM PERSON")
+func GetAllPersonsHandler(db *gorm.DB) []Person {
+	person := []Person{}
+	db.Find(&person)
 
-	if err != nil {
-		log.Fatalf("err %v\n", err)
-		return nil
-	}
-
-	people := []Person{}
-	for results.Next() {
-		var t Person
-		err = results.Scan(&t.ID, &t.Name, &t.TelegramId)
-
-		if err != nil {
-			log.Fatalf("err %v\n", err)
-		}
-
-		people = append(people, t)
-	}
-
-	return people
+	return person
 
 }
 
-func AddPersonHandler(db *sql.DB, person Person) {
-	insert, err := db.Query(
-		"INSERT INTO PERSON (NAME, TELEGRAM_ID) VALUES (?,?)",
-		person.Name, person.TelegramId)
+func AddPersonHandler(db *gorm.DB, person Person) {
+	db.Create(&person)
 
-	if err != nil {
-		log.Fatalf("err %v\n", err)
-	}
-	defer insert.Close()
+	fmt.Printf("Created user with ID %v\n", person.ID)
+
 }
