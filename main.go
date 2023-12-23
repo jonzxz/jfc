@@ -41,12 +41,13 @@ func main() {
 	router := gin.Default()
 
 	// model.Person
-	router.GET("/people", func(c *gin.Context) {
+	router.GET("/people/list", func(c *gin.Context) {
 		people := models.GetAllPersonsHandler(db)
 		c.IndentedJSON(http.StatusOK, people)
 
 	})
-	router.POST("/add", func(c *gin.Context) {
+
+	router.POST("/people/add", func(c *gin.Context) {
 		var newPerson models.Person
 		if err := c.BindJSON(&newPerson); err != nil {
 			log.Fatalf("%v\n", err)
@@ -59,10 +60,19 @@ func main() {
 	router.GET("/payments", func(c *gin.Context) {
 		queryParams := c.Request.URL.Query()
 
-		payments := models.GetPaymentWrapper(db, queryParams)
+		payments := models.GetPaymentWrapper(db, &queryParams)
 
 		//}
 		c.IndentedJSON(http.StatusOK, payments)
+	})
+
+	router.POST("/payments/add", func(c *gin.Context) {
+		var newPayment models.Payment
+		if err := c.BindJSON(&newPayment); err != nil {
+			log.Fatalf("%v\n", err)
+		}
+		models.AddPaymentHandler(db, newPayment)
+		c.IndentedJSON(http.StatusCreated, newPayment)
 	})
 
 	router.Run("localhost:8080")
