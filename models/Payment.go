@@ -30,22 +30,25 @@ func GetAllPaymentsHandler(db *gorm.DB) []Payment {
 	return payments
 }
 
-// realistically only need
-// type + timestamp
-// timestamp
-func GetPaymentWrapper(db *gorm.DB, params url.Values) []Payment {
+func GetPaymentWrapper(db *gorm.DB, params *url.Values) []Payment {
 	var payment []Payment
 	if params.Has("id") {
+		fmt.Printf("Retrieving payments by id: %v\n", params.Get("id"))
 		ids := strings.Split(params.Get("id"), ",")
 		payment = getPaymentsByIdHandler(db, ids)
 	} else if params.Has("type") && params.Has("month") {
-		fmt.Println("type and month")
+		fmt.Printf("Retrieving payments by month: %v and type: %v\n", params.Get("month"), params.Get("type"))
+		payment = getPaymentsByMonthAndTypeHander(db, params.Get("month"), params.Get("type"))
 	} else if params.Has("type") {
+		fmt.Printf("Retrieving payments by type: %v\n", params.Get("type"))
 		payment = getPaymentsByTypeHandler(db, params.Get("type"))
 	} else if params.Has("month") {
-		fmt.Println("am here")
+		fmt.Printf("Retrieving payments by month: %v\n", params.Get("month"))
 		payment = getPaymentsByMonthHandler(db, params.Get("month"))
+	} else {
+		db.Limit(10).Find(&payment)
 	}
+
 	return payment
 
 }
@@ -60,6 +63,13 @@ func getPaymentsByIdHandler(db *gorm.DB, ids []string) []Payment {
 		db.Find(&payments, ids)
 	}
 
+	return payments
+}
+
+func getPaymentsByMonthAndTypeHander(db *gorm.DB, month string, paymentType string) []Payment {
+	var payments []Payment
+	epochRange := getStartEndEpochFromMonth(month)
+	db.Where("TIMESTAMP BETWEEN ? AND ? AND TYPE = ?", epochRange["start"], epochRange["end"], paymentType).Find(&payments)
 	return payments
 }
 
@@ -100,4 +110,11 @@ func getStartEndEpochFromMonth(month string) map[string]int64 {
 
 	return epochs
 
+}
+
+func AddPaymentHandler(db *gorm.DB, payment Payment) {
+	payment.Timestamp = time.Now().Unix()
+	db.Create(&payment)
+
+	fmt.Printf("Created payment with %v\n", payment)
 }
