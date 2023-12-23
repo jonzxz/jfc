@@ -23,8 +23,11 @@ dependencies:
 run:
 	go run .
 
-add:
-	curl localhost:8080/add --include --header "Content-Type: application/json" --request "POST" --data '{"name":"Jeff","TelegramId":"@jeff"}'
+addperson:
+	curl localhost:8080/people/add --include --header "Content-Type: application/json" --request "POST" --data '{"name":"Jeff","TelegramId":"@jeff"}'
+
+addpayment:
+	curl localhost:8080/payments/add --include --header "Content-Type: application/json" --request "POST" --data '{"type":"Conservancy","remarks":"Conservancy for Dec", "totalamount":69.9}'
 
 db:
 	docker run --name="db" -d -p 3306:3306 \
