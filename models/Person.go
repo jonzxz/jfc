@@ -27,6 +27,6 @@ func GetAllPersonsHandler(db *gorm.DB) []Person {
 func AddPersonHandler(db *gorm.DB, person Person) {
 	db.Create(&person)
 
-	fmt.Printf("Created user with ID %v\n", person.ID)
+	fmt.Printf("Created user: %v\n", person)
 
 }
