@@ -37,7 +37,6 @@ func AddPaymentDueFromPaymentHandler(db *gorm.DB, payment *Payment) {
 		}
 		db.Create(&paymentDue)
 	}
-
 }
 
 func GetAllPaymentDueHandler(db *gorm.DB) []PaymentDue {
@@ -46,4 +45,10 @@ func GetAllPaymentDueHandler(db *gorm.DB) []PaymentDue {
 	db.Find(&paymentDue)
 
 	return paymentDue
+}
+
+func UpdatePaymentDuePaidHandler(db *gorm.DB, paymentDue PaymentDue) {
+	db.First(&paymentDue)
+	paymentDue.Paid = true
+	db.Save(&paymentDue)
 }

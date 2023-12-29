@@ -81,6 +81,15 @@ func main() {
 		c.IndentedJSON(http.StatusOK, paymentDue)
 	})
 
+	router.POST("/due/pay", func(c *gin.Context) {
+		var paymentDue models.PaymentDue
+		if err := c.BindJSON(&paymentDue); err != nil {
+			log.Fatalf("%v\n", err)
+		}
+		models.UpdatePaymentDuePaidHandler(db, paymentDue)
+		c.IndentedJSON(http.StatusOK, paymentDue)
+	})
+
 	router.Run("localhost:8080")
 
 }

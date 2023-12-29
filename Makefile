@@ -30,6 +30,9 @@ addperson:
 addpayment:
 	curl localhost:8080/payments/add --include --header "Content-Type: application/json" --request "POST" --data '{"type":"Conservancy","remarks":"Conservancy for Dec", "totalamount":69.9}'
 
+updatepay:
+	curl localhost:8080/due/pay --include --header "Content-Type: application/json" --request "POST" --data '{"ID":1}'
+
 db:
 	docker run --name="db" -d -p 3306:3306 \
 	-e MYSQL_ROOT_PASSWORD='secretrootpassword' \
