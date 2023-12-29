@@ -4,7 +4,8 @@ define HELP
 	make build
 	make dependencies
 	make run
-	make add (add user)
+	make addperson
+	make addpayment
 	make db (run db)
 	make stopdb
 endef
