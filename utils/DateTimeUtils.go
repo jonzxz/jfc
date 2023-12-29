@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func getStartEndEpochFromMonth(month string) map[string]int64 {
+func GetStartEndEpochFromMonth(month string) map[string]int64 {
 	now := time.Now()
 	currentYear, _, _ := now.Date()
 	monthInt, _ := strconv.Atoi(month)

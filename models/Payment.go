@@ -3,10 +3,10 @@ package models
 import (
 	"fmt"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 
+	"github.com/jonzxz/jfc/utils"
 	"gorm.io/gorm"
 )
 
@@ -68,7 +68,7 @@ func getPaymentsByIdHandler(db *gorm.DB, ids []string) []Payment {
 
 func getPaymentsByMonthAndTypeHander(db *gorm.DB, month string, paymentType string) []Payment {
 	var payments []Payment
-	epochRange := getStartEndEpochFromMonth(month)
+	epochRange := utils.GetStartEndEpochFromMonth(month)
 	db.Where("TIMESTAMP BETWEEN ? AND ? AND TYPE = ?", epochRange["start"], epochRange["end"], paymentType).Find(&payments)
 	return payments
 }
@@ -83,33 +83,11 @@ func getPaymentsByTypeHandler(db *gorm.DB, paymentType string) []Payment {
 func getPaymentsByMonthHandler(db *gorm.DB, month string) []Payment {
 
 	var payments []Payment
-	epochRange := getStartEndEpochFromMonth(month)
+	epochRange := utils.GetStartEndEpochFromMonth(month)
 
 	db.Where("TIMESTAMP BETWEEN ? AND ?", epochRange["start"], epochRange["end"]).Find(&payments)
 
 	return payments
-}
-
-func getStartEndEpochFromMonth(month string) map[string]int64 {
-	now := time.Now()
-	currentYear, _, _ := now.Date()
-	monthInt, _ := strconv.Atoi(month)
-	monthTime := time.Month(monthInt)
-	currentLocation := now.Location()
-	firstOfMonth := time.Date(currentYear, monthTime, 1, 0, 0, 0, 0, currentLocation)
-	// dirty add to make 23:59:59
-	lastOfMonth := firstOfMonth.AddDate(0, 1, -1).UTC().Add(time.Hour * 23).Add(time.Minute * 59).Add(time.Second * 59)
-
-	startUnix := firstOfMonth.Unix()
-	endUnix := lastOfMonth.Unix()
-
-	epochs := make(map[string]int64)
-
-	epochs["start"] = startUnix
-	epochs["end"] = endUnix
-
-	return epochs
-
 }
 
 // Adds a Payment row and creates corresponding rows in PaymentDue
