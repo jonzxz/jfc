@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/jonzxz/jfc/utils"
 	"gorm.io/gorm"
 )
 
@@ -24,12 +25,13 @@ func AddPaymentDueFromPaymentHandler(db *gorm.DB, payment *Payment) {
 	people := GetAllPersonsHandler(db)
 	numOfPayablePax := len(people)
 	individualAmountPayable := payment.TotalAmount / float32(numOfPayablePax)
+	paymentDueTimestamp := utils.GetLastEpochOfCurrentMonthFromEpoch(payment.Timestamp)
 
 	for _, p := range people {
 		paymentDue := PaymentDue{
 			PayerID:        p.ID,
 			PaymentID:      payment.ID,
-			PaymentDueDate: 1703837210,
+			PaymentDueDate: paymentDueTimestamp,
 			PayableAmount:  individualAmountPayable,
 			Paid:           false,
 		}
