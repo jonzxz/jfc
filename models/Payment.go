@@ -112,9 +112,10 @@ func getStartEndEpochFromMonth(month string) map[string]int64 {
 
 }
 
+// Adds a Payment row and creates corresponding rows in PaymentDue
 func AddPaymentHandler(db *gorm.DB, payment Payment) {
 	payment.Timestamp = time.Now().Unix()
 	db.Create(&payment)
 
-	fmt.Printf("Created payment with %v\n", payment)
+	AddPaymentDueFromPaymentHandler(db, &payment)
 }

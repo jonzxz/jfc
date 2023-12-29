@@ -75,6 +75,12 @@ func main() {
 		c.IndentedJSON(http.StatusCreated, newPayment)
 	})
 
+	// model.PaymentDue
+	router.GET("/due", func(c *gin.Context) {
+		paymentDue := models.GetAllPaymentDueHandler(db)
+		c.IndentedJSON(http.StatusOK, paymentDue)
+	})
+
 	router.Run("localhost:8080")
 
 }
