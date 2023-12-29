@@ -13,10 +13,11 @@ import (
 type Payment struct {
 	ID int `json:"ID" gorm:"primaryKey"`
 	// pass in as string, convert to uint64 epoch
-	Timestamp   int64   `json:"Timestamp" gorm:"column:TIMESTAMP"`
-	Type        string  `json:"Type" gorm:"column:TYPE"`
-	Remarks     string  `json:"Remarks" gorm:"column:REMARKS"`
-	TotalAmount float32 `json:"TotalAmount" gorm:"column:TOTAL_AMOUNT"`
+	Type                 string  `json:"Type" gorm:"column:TYPE"`
+	Remarks              string  `json:"Remarks" gorm:"column:REMARKS"`
+	TotalAmount          float32 `json:"TotalAmount" gorm:"column:TOTAL_AMOUNT"`
+	CreatedTimestamp     int64   `gorm:"column:CREATED_TS"`
+	LastUpdatedTimestamp int64   `gorm:"column:LAST_UPDATED_TS"`
 }
 
 func (Payment) TableName() string {
@@ -92,7 +93,7 @@ func getPaymentsByMonthHandler(db *gorm.DB, month string) []Payment {
 
 // Adds a Payment row and creates corresponding rows in PaymentDue
 func AddPaymentHandler(db *gorm.DB, payment Payment) {
-	payment.Timestamp = time.Now().Unix()
+	payment.CreatedTimestamp = time.Now().Unix()
 	db.Create(&payment)
 
 	AddPaymentDueFromPaymentHandler(db, &payment)
