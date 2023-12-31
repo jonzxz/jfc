@@ -25,10 +25,10 @@ run:
 	go run .
 
 addperson:
-	curl localhost:8080/people/add --include --header "Content-Type: application/json" --request "POST" --data '{"name":"Jeff","TelegramId":"@jeff"}'
+	curl localhost:8080/people/add --include --header "Content-Type: application/json" --request "POST" --data '{"name":"Jeff","TelegramId":"@jeff","Household":"123"}'
 
 addpayment:
-	curl localhost:8080/payments/add --include --header "Content-Type: application/json" --request "POST" --data '{"type":"Conservancy","remarks":"Conservancy for Dec", "totalamount":69.9}'
+	curl localhost:8080/payments/add --include --header "Content-Type: application/json" --request "POST" --data '{"type":"Conservancy","remarks":"Conservancy for Dec", "totalamount":69.9, "household":"123"}'
 
 updatepay:
 	curl localhost:8080/due/pay --include --header "Content-Type: application/json" --request "POST" --data '{"ID":1}'

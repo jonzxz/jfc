@@ -47,7 +47,7 @@ func main() {
 
 	})
 
-	router.POST("/people/add", func(c *gin.Context) {
+	router.POST("/people", func(c *gin.Context) {
 		var newPerson models.Person
 		if err := c.BindJSON(&newPerson); err != nil {
 			log.Fatalf("%v\n", err)

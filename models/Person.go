@@ -11,6 +11,7 @@ type Person struct {
 	ID                   int    `json:"ID" gorm:"primaryKey"`
 	Name                 string `json:"Name" gorm:"column:NAME"`
 	TelegramId           string `json:"TelegramId" gorm:"column:TELEGRAM_ID"`
+	Household            string `json:"Household" gorm:"column:HOUSEHOLD"`
 	CreatedTimestamp     int64  `gorm:"column:CREATED_TS"`
 	LastUpdatedTimestamp int64  `gorm:"column:LAST_UPDATED_TS"`
 }

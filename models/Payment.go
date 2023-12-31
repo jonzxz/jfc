@@ -16,6 +16,7 @@ type Payment struct {
 	Type                 string  `json:"Type" gorm:"column:TYPE"`
 	Remarks              string  `json:"Remarks" gorm:"column:REMARKS"`
 	TotalAmount          float32 `json:"TotalAmount" gorm:"column:TOTAL_AMOUNT"`
+	Household            string  `json:"Household" gorm:"column:HOUSEHOLD"`
 	CreatedTimestamp     int64   `gorm:"column:CREATED_TS"`
 	LastUpdatedTimestamp int64   `gorm:"column:LAST_UPDATED_TS"`
 }
